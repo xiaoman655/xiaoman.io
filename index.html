@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>代码沉思录 | 前端开发技术博客</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+    <style>
+        /* 设计系统 */
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --transition: all 0.25s ease;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --radius-sm: 4px;
+            --radius-md: 8px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: var(--light);
+        }
+        
+        h1, h2, h3, h4 {
+            font-weight: 600;
+            line-height: 1.3;
+        }
+        
+        code, pre {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: var(--transition);
+        }
+        
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* 简洁导航 */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            padding: 20px 0;
+            background-color: rgba(255, 255, 255, 0.98);
+            border-bottom: 1px solid var(--gray-light);
+            backdrop-filter: blur(8px);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .logo span {
+            color: var(--dark);
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 28px;
+        }
+        
+        .nav-links a {
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: var(--gray);
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        /* 专业英雄区 */
+        .hero {
+            padding: 180px 0 100px;
+            text-align: center;
+            background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), 
+                        url('https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .hero h1 {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto 40px;
+            line-height: 1.7;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        /* 技术文章卡片 */
+        .section {
+            padding: 80px 0;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 50px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background-color: var(--primary);
+        }
+        
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+        
+        .post-card {
+            background: white;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-light);
+            transition: var(--transition);
+        }
+        
+        .post-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-light);
+        }
+        
+        .post-image {
+            height: 180px;
+            overflow: hidden;
+        }
+        
+        .post-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .post-card:hover .post-image img {
+            transform: scale(1.05);
+        }
+        
+        .post-content {
+            padding: 24px;
+        }
+        
+        .post-meta {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        
+        .post-tag {
+            background-color: #e0e7ff;
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .post-title {
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+        }
+        
+        .post-excerpt {
+            color: var(--gray);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+        
+        .post-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--gray);
+            padding-top: 16px;
+            border-top: 1px solid var(--gray-light);
+        }
+        
+        /* 技术订阅区 */
+        .newsletter {
+            background-color: white;
+            border-radius: var(--radius-md);
+            padding: 50px;
+            margin: 60px 0;
+            border: 1px solid var(--gray-light);
+            text-align: center;
+            background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), 
+                      url('https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .newsletter h3 {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+        
+        .newsletter p {
+            color: var(--gray);
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .subscribe-form {
+            display: flex;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .subscribe-form input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+            font-size: 0.95rem;
+            outline: none;
+        }
+        
+        .subscribe-form input:focus {
+            border-color: var(--primary);
+        }
+        
+        .subscribe-form button {
+            padding: 12px 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .subscribe-form button:hover {
+            background-color: var(--primary-light);
+        }
+        
+        /* 简洁页脚 */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 60px 0 30px;
+            background: linear-gradient(rgba(30,41,59,0.9), rgba(30,41,59,0.9)), 
+                      url('https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+        
+        .footer-column h4 {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: white;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-links a {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 16px;
+            margin-top: 20px;
+        }
+        
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+        
+        .social-links a:hover {
+            background-color: var(--primary);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .hero {
+                padding: 140px 0 80px;
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .posts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .newsletter {
+                padding: 30px;
+            }
+            
+            .subscribe-form {
+                flex-direction: column;
+            }
+            
+            .subscribe-form input,
+            .subscribe-form button {
+                width: 100%;
+                border-radius: var(--radius-sm);
+            }
+            
+            .subscribe-form button {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 专业导航栏 -->
+    <header>
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">代码<span>沉思录</span></a>
+                <ul class="nav-links">
+                    <li><a href="#">首页</a></li>
+                    <li><a href="#">文章</a></li>
+                    <li><a href="#">项目</a></li>
+                    <li><a href="#">关于</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <!-- 专业英雄区（带精美背景图） -->
+    <section class="hero">
+        <div class="container">
+            <h1>深入前端技术核心</h1>
+            <p>分享现代Web开发经验，探索JavaScript生态，记录技术实践与架构思考</p>
+            <a href="#posts" class="btn btn-primary">浏览最新文章</a>
+        </div>
+    </section>
+    
+    <!-- 主要内容 -->
+    <main class="container">
+        <!-- 技术文章 -->
+        <section class="section" id="posts">
+            <h2 class="section-title">技术文章</h2>
+            <div class="posts-grid">
+                <!-- 文章卡片1 - JavaScript -->
+                <article class="post-card">
+                    <div class="post-image">
+                        <img src="https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="JavaScript代码">
+                    </div>
+                    <div class="post-content">
+                        <div class="post-meta">
+                            <span>2023-08-15</span>
+                            <span class="post-tag">JavaScript</span>
+                        </div>
+                        <h3 class="post-title">深入理解ES2023新特性</h3>
+                        <p class="post-excerpt">全面解析ECMAScript 2023新增特性，包括Array.findLast、Hashbang语法等，以及实际应用场景分析。</p>
+                        <div class="post-footer">
+                            <span>12分钟阅读</span>
+                            <span>#前端</span>
+                        </div>
+                    </div>
+                </article>
+                
+                <!-- 文章卡片2 - React -->
+                <article class="post-card">
+                    <div class="post-image">
+                        <img src="https://images.unsplash.com/photo-1633356122544-f134324a6cee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="React开发">
+                    </div>
+                    <div class="post-content">
+                        <div class="post-meta">
+                            <span>2023-07-28</span>
+                            <span class="post-tag">React</span>
+                        </div>
+                        <h3 class="post-title">React性能优化实战</h3>
+                        <p class="post-excerpt">从项目实战角度分享React应用性能优化的7个关键策略，包括memo、useMemo等高级用法。</p>
+                        <div class="post-footer">
+                            <span>15分钟阅读</span>
+                            <span>#优化</span>
+                        </div>
+                    </div>
+                </article>
+                
+                <!-- 文章卡片3 - TypeScript -->
+                <article class="post-card">
+                    <div class="post-image">
+                        <img src="https://images.unsplash.com/photo-1627398242454-45a1465c2479?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80" alt="TypeScript代码">
+                    </div>
+                    <div class="post-content">
+                        <div class="post-meta">
+                            <span>2023-06-10</span>
+                            <span class="post-tag">TypeScript</span>
+                        </div>
+                        <h3 class="post-title">TypeScript高级类型实践</h3>
+                        <p class="post-excerpt">深入探讨TypeScript实用类型、条件类型和类型推断，提升类型系统设计能力。</p>
+                        <div class="post-footer">
+                            <span>10分钟阅读</span>
+                            <span>#类型系统</span>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+        
+        <!-- 技术订阅区（带精美背景图） -->
+        <section class="newsletter">
+            <h3>订阅技术周刊</h3>
+            <p>每周精选前端技术文章、工具资源和行业动态，直接发送到您的邮箱</p>
+            <form class="subscribe-form">
+                <input type="email" placeholder="您的邮箱地址" required>
+                <button type="submit">立即订阅</button>
+            </form>
+        </section>
+    </main>
+    
+    <!-- 简洁页脚（带精美背景图） -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h4>代码沉思录</h4>
+                    <p>专注于前端技术深度分享与实践经验总结。</p>
+                    <div class="social-links">
+                        <a href="#"><i>G</i></a>
+                        <a href="#"><i>T</i></a>
+                        <a href="#"><i>W</i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h4>快速链接</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">首页</a></li>
+                        <li><a href="#">所有文章</a></li>
+                        <li><a href="#">开源项目</a></li>
+                        <li><a href="#">技术栈</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>技术分类</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">JavaScript</a></li>
+                        <li><a href="#">React</a></li>
+                        <li><a href="#">TypeScript</a></li>
+                        <li><a href="#">工程化</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>联系我</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">关于作者</a></li>
+                        <li><a href="#">GitHub</a></li>
+                        <li><a href="#">Twitter</a></li>
+                        <li><a href="#">邮箱</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 2023 代码沉思录 - 专注前端技术分享
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
